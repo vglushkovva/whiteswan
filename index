@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhiteSwan — UX Прототип</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:64px 32px}
+.header{margin-bottom:56px}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.logo-icon{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3a7bd5,#00d2ff)}
+.logo-text{font-size:18px;font-weight:600;letter-spacing:-.3px}
+.title{font-size:36px;font-weight:600;letter-spacing:-.8px;line-height:1.15;margin-bottom:12px}
+.title span{color:#2563eb}
+.subtitle{font-size:16px;color:#6b6b6b;line-height:1.6;max-width:560px}
+.meta{display:flex;gap:20px;margin-top:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#888}
+.meta-dot{width:6px;height:6px;border-radius:50%;background:#66bb6a}
+
+.section-label{font-size:11px;font-weight:500;color:#a0a0a0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:48px}
+.card{background:#fff;border:1px solid #e8e6e1;border-radius:14px;padding:24px 26px;text-decoration:none;color:inherit;transition:all .2s;display:block;position:relative;overflow:hidden}
+.card:hover{border-color:#b8cfe8;box-shadow:0 4px 24px rgba(0,0,0,.07);transform:translateY(-2px)}
+.card.primary{border-color:#c5d8f5;background:#f8fbff}
+.card.primary:hover{border-color:#2563eb}
+.card-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;margin-bottom:14px}
+.badge-new{background:#e8f5e9;color:#2e7d32}
+.badge-updated{background:#eff4ff;color:#2563eb}
+.badge-doc{background:#f5f0ff;color:#5e35b1}
+.card-icon{font-size:28px;margin-bottom:12px;display:block}
+.card-title{font-size:17px;font-weight:600;letter-spacing:-.3px;margin-bottom:6px}
+.card-desc{font-size:13px;color:#6b6b6b;line-height:1.5;margin-bottom:16px}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 8px;background:#f5f5f3;border-radius:6px;color:#888}
+.card-arrow{position:absolute;top:24px;right:24px;font-size:18px;color:#d0cdc6;transition:color .2s,transform .2s}
+.card:hover .card-arrow{color:#2563eb;transform:translate(2px,-2px)}
+
+.divider{height:1px;background:#e8e6e1;margin-bottom:32px}
+
+.info-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.info-card{flex:1;min-width:180px;background:#fff;border:1px solid #e8e6e1;border-radius:12px;padding:16px 18px}
+.info-label{font-size:11px;color:#a0a0a0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.info-val{font-size:15px;font-weight:500}
+
+.footer{font-size:12px;color:#a0a0a0;line-height:1.6}
+.footer b{color:#6b6b6b;font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <span class="logo-text">WhiteSwan.finance</span>
+    </div>
+    <h1 class="title">UX-прототип<br><span>Март 2026</span></h1>
+    <p class="subtitle">Интерактивные макеты по результатам UX-аудита. Кликабельные, без дизайна — для обсуждения логики и структуры.</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div>228 скриншотов проанализировано</div>
+      <div class="meta-item"><div class="meta-dot"></div>8 интервью</div>
+      <div class="meta-item"><div class="meta-dot"></div>6 конкурентов</div>
+    </div>
+  </div>
+
+  <div class="section-label">Основные экраны</div>
+  <div class="cards">
+
+    <a href="dashboard.html" class="card primary">
+      <span class="card-arrow">↗</span>
+      <div class="card-badge badge-new">✦ Обновлено</div>
+      <span class="card-icon">🏠</span>
+      <div class="card-title">Главная — дашборд</div>
+      <div class="card-desc">Три состояния пользователя: Новичок, Активный, Инвестор. Маскот-лебедь, бюджет-спидометр, недельный челлендж, скоринг месяца.</div>
+      <div class="card-tags">
+        <span class="tag">Новичок</span>
+        <span class="tag">Активный</span>
+        <span class="tag">Инвестор</span>
+        <span class="tag">Retention</span>
+      </div>
+    </a>
+
+    <a href="finplan.html" class="card primary">
+      <span class="card-arrow">↗</span>
+      <div class="card-badge badge-new">✦ Новый</div>
+      <span class="card-icon">📊</span>
+      <div class="card-title">Финплан v2</div>
+      <div class="card-desc">Проекция капитала на графике, цели с взносами, 6 сценариев «Что если». Таблица данных убрана наверх страницы, живые расчёты.</div>
+      <div class="card-tags">
+        <span class="tag">Проекция</span>
+        <span class="tag">Цели</span>
+        <span class="tag">Сценарии</span>
+        <span class="tag">Chart.js</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-label">Retention-концепты</div>
+  <div class="cards">
+
+    <a href="retention-widgets.html" class="card">
+      <span class="card-arrow">↗</span>
+      <div class="card-badge badge-updated">Концепт</div>
+      <span class="card-icon">🎯</span>
+      <div class="card-title">Retention-виджеты</div>
+      <div class="card-desc">13 интерактивных дашбордов: маскот-лебедь, бюджет-спидометр, контроль подписок, паттерн пятниц, Net Worth, сравнение с рынком и другие.</div>
+      <div class="card-tags">
+        <span class="tag">Ежедневно</span>
+        <span class="tag">Еженедельно</span>
+        <span class="tag">Ежемесячно</span>
+      </div>
+    </a>
+
+    <a href="retention-ideas.html" class="card">
+      <span class="card-arrow">↗</span>
+      <div class="card-badge badge-doc">Документ</div>
+      <span class="card-icon">💡</span>
+      <div class="card-title">40 идей удержания</div>
+      <div class="card-desc">Структурированный документ: ежедневные, еженедельные и ежемесячные крючки. Приоритизация по усилию и impact'у.</div>
+      <div class="card-tags">
+        <span class="tag">40 идей</span>
+        <span class="tag">Приоритеты</span>
+        <span class="tag">Петля привычки</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="info-row">
+    <div class="info-card">
+      <div class="info-label">Статус</div>
+      <div class="info-val">UX-аудит завершён</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Следующий шаг</div>
+      <div class="info-val">Дизайн в Figma</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Версия</div>
+      <div class="info-val">Март 2026</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Платформа</div>
+      <div class="info-val">Десктоп, веб</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <b>Это прототип для обсуждения логики</b> — не финальный дизайн.<br>
+    Цвета, типографика, иконки и компоненты будут отрисованы в Figma на следующем этапе.<br>
+    Команда: UX-ресёрчер · Продакт-менеджер · Арт-директор
+  </div>
+
+</div>
+</body>
+</html>

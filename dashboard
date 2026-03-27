@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhiteSwan — Главная v2</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans',sans-serif;background:#f5f5f3;color:#1a1a1a;-webkit-font-smoothing:antialiased}
+.shell{display:flex;height:100vh;max-width:1280px;margin:0 auto;background:#fff;border-left:1px solid #e8e6e1;border-right:1px solid #e8e6e1}
+.sidebar{width:220px;border-right:1px solid #e8e6e1;padding:28px 0;flex-shrink:0;display:flex;flex-direction:column}
+.logo{padding:0 20px 28px;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a7bd5,#00d2ff)}
+.logo-text{font-size:14px;font-weight:600;letter-spacing:-0.3px}
+.nav{flex:1}
+.nav-item{display:block;padding:10px 20px;font-size:14px;color:#6b6b6b;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{color:#1a1a1a;background:#fafaf8}
+.nav-item.active{color:#2563eb;font-weight:500;border-left-color:#2563eb;background:#eff4ff}
+.nav-sep{height:1px;background:#e8e6e1;margin:12px 20px}
+.quick-add{margin:0 16px 20px}
+.quick-add-btn{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.main{flex:1;overflow-y:auto;padding:28px 32px}
+/* top bar */
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.page-title{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.greeting{font-size:15px;color:#888;margin-bottom:2px}
+/* state switcher */
+.demo-toggle{display:flex;gap:6px;margin-bottom:20px}
+.demo-opt{padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid #e0ddd7;background:#fff;color:#6b6b6b;font-family:inherit;transition:all .15s}
+.demo-opt.active{background:#2563eb;color:#fff;border-color:#2563eb}
+/* sync bar */
+.sync-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#f4faf4;border-radius:8px;font-size:12px;color:#2e7d32}
+.sdot{width:6px;height:6px;border-radius:50%;background:#66bb6a}
+.stime{color:#88bfa0}
+/* metrics */
+.metrics{display:grid;gap:12px;margin-bottom:20px}
+.m3{grid-template-columns:repeat(3,1fr)}
+.m4{grid-template-columns:repeat(4,1fr)}
+.metric{background:#fafaf8;border-radius:10px;padding:16px 18px;position:relative}
+.metric.accent{background:#eff4ff}
+.metric.empty{border:1px dashed #e0ddd7;background:#fefefe}
+.metric.green-tint{background:#f0faf2}
+.metric.amber-tint{background:#fef9ed}
+.metric.red-tint{background:#fff5f5}
+.ml{font-size:12px;color:#888;margin-bottom:6px}
+.mv{font-size:24px;font-weight:600;letter-spacing:-.5px;line-height:1.2}
+.mv.g{color:#16864e}.mv.r{color:#c0392b}.mv.b{color:#2563eb}.mv.ph{color:#d0cdc6;font-size:22px;font-weight:500}
+.ms{font-size:11px;color:#aaa;margin-top:4px}
+.mlink{font-size:11px;color:#2563eb;cursor:pointer;margin-top:6px;display:inline-block}
+.mq{position:absolute;top:14px;right:14px;width:18px;height:18px;border-radius:50%;background:#f0ede8;display:flex;align-items:center;justify-content:center;font-size:10px;color:#a0a0a0;font-weight:600}
+.trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;margin-top:4px;color:#16864e}
+.trend.neg{color:#c0392b}
+/* context badge on metric */
+.ctx-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;margin-top:6px;padding:2px 8px;border-radius:6px}
+.ctx-ok{background:#e8f5e9;color:#2e7d32}
+.ctx-warn{background:#fff3e0;color:#e65100}
+.ctx-bad{background:#fde8e8;color:#c0392b}
+/* mini bar in metric */
+.m-bar-wrap{height:4px;background:#e8e6e1;border-radius:2px;overflow:hidden;margin-top:10px}
+.m-bar{height:100%;border-radius:2px;transition:width .3s}
+/* actions */
+.actions-box{border:1px solid #e8e6e1;border-radius:12px;padding:16px 18px;margin-bottom:20px}
+.actions-title{font-size:15px;font-weight:500;margin-bottom:12px}
+.aitem{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.aitem:last-child{margin-bottom:0}
+.aitem:hover{filter:brightness(.97)}
+.aitem.red{background:#fef5f5}.aitem.orange{background:#fef9ed}.aitem.blue{background:#f0f6ff}.aitem.purple{background:#f5f0ff}.aitem.green{background:#f0faf2}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.adot.red{background:#e06060}.adot.orange{background:#e6a817}.adot.blue{background:#5a9cf5}.adot.purple{background:#9575cd}.adot.green{background:#66bb6a}
+.acontent{flex:1;font-size:13px}.acontent b{font-weight:500}
+.asub{font-size:11px;color:#a0a0a0;margin-top:1px}
+.abtn{padding:5px 12px;border-radius:7px;border:1px solid #e0ddd7;background:#fff;font-size:12px;font-weight:500;color:#2563eb;cursor:pointer;font-family:inherit;white-space:nowrap}
+.abtn:hover{background:#eff4ff}
+.astatus{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.astatus.ok{background:#e8f5e9;color:#2e7d32}
+.astatus.warn{background:#fde8e8;color:#c0392b}
+/* two-col / three-col blocks */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+.block{border:1px solid #e8e6e1;border-radius:12px;padding:16px 18px}
+.block.dashed{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:140px}
+.bh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.bt{font-size:15px;font-weight:500}
+.blink{font-size:12px;color:#2563eb;cursor:pointer}
+.card{background:#fafaf8;border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.card:last-child{margin-bottom:0}
+/* goal bars */
+.goal-bar{height:6px;background:#e8e6e1;border-radius:3px;overflow:hidden;margin:4px 0}
+.goal-fill{height:100%;border-radius:3px}
+.goal-fill.ok{background:#66bb6a}.goal-fill.behind{background:#e06060}.goal-fill.amber{background:#f59e0b}
+/* progress onboarding */
+.progress-wrap{background:#fff;border:1px solid #e0ddd7;border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.progress-bar-row{display:flex;gap:6px;margin-bottom:14px}
+.pseg{flex:1;height:6px;border-radius:3px;background:#e8e6e1}
+.pseg.done{background:#66bb6a}.pseg.current{background:#2563eb}
+.psteps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pstep{padding:10px 14px;border-radius:10px;border:1px solid #e8e6e1;cursor:pointer}
+.pstep.done{border-color:#c8e6c9;background:#f4faf4}
+.pstep.current{border-color:#2563eb;background:#eff4ff}
+.pstep-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.pstep.pending .pstep-num{background:#f5f5f3;color:#a0a0a0}
+.pstep.current .pstep-num{background:#2563eb;color:#fff}
+.pstep.done .pstep-num{background:#66bb6a;color:#fff}
+.pstep-title{font-size:13px;font-weight:500}
+.pstep.done .pstep-title{color:#2e7d32}
+.pstep-sub{font-size:11px;color:#a0a0a0;margin-top:2px}
+.pstep.current .pstep-sub{color:#6b8fd4}
+.pstep.done .pstep-sub{color:#66bb6a}
+/* btn */
+.btn{padding:9px 18px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:none}
+.btn-p{background:#2563eb;color:#fff}.btn-s{background:#f5f5f3;color:#6b6b6b;border:1px solid #e0ddd7}
+
+/* ═══════════════════════════════════════
+   НОВЫЕ RETENTION ВИДЖЕТЫ
+   ═══════════════════════════════════════ */
+
+/* 1. Swan mascot / streak */
+.mascot-block{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f0d882;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.swan-avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#fff8e1,#fef3c7);border:2px solid #f0d882;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;position:relative}
+.swan-level{position:absolute;bottom:-6px;right:-6px;background:#f59e0b;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px}
+.mascot-info{flex:1}
+.mascot-name{font-size:15px;font-weight:600;color:#92400e;margin-bottom:2px}
+.mascot-status{font-size:12px;color:#b45309;margin-bottom:10px}
+.streak-days{display:flex;gap:4px;margin-bottom:8px}
+.streak-day{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;border:1.5px solid #f0d882;background:#fff8e1;color:#b45309;font-weight:500}
+.streak-day.done{background:#f59e0b;border-color:#f59e0b;color:#fff}
+.streak-day.today{border-color:#f59e0b;border-width:2px;background:#fff;color:#f59e0b}
+.streak-lvl-bar{height:4px;background:#f0d882;border-radius:2px;overflow:hidden;margin-bottom:4px}
+.streak-lvl-fill{height:100%;background:#f59e0b;border-radius:2px;width:68%}
+.streak-lvl-txt{display:flex;justify-content:space-between;font-size:10px;color:#92400e}
+.mascot-badges{display:flex;gap:5px;flex-wrap:wrap}
+.m-badge{font-size:10px;padding:2px 7px;border-radius:6px;background:#fef3c7;color:#92400e;border:1px solid #f0d882;font-weight:500}
+.mascot-right{text-align:right;flex-shrink:0}
+.streak-count{font-size:36px;font-weight:700;color:#f59e0b;letter-spacing:-.02em;line-height:1}
+.streak-label{font-size:11px;color:#b45309;margin-top:2px}
+
+/* 2. Budget spidometer */
+.spido-block{border:1px solid #e8e6e1;border-radius:12px;padding:20px 22px;margin-bottom:20px;position:relative;overflow:hidden;transition:border-color .3s,background .3s}
+.spido-block.s-ok{background:#f0faf2;border-color:#c8e6c9}
+.spido-block.s-warn{background:#fef9ed;border-color:#f0d882}
+.spido-block.s-bad{background:#fef5f5;border-color:#f5c4c4}
+.spido-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.spido-label{font-size:12px;color:#888;margin-bottom:4px}
+.spido-amount{font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1;transition:color .3s}
+.spido-amount.s-ok{color:#16864e}
+.spido-amount.s-warn{color:#d97706}
+.spido-amount.s-bad{color:#c0392b}
+.spido-sub{font-size:13px;color:#888;margin-top:4px}
+.spido-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.spido-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:8px}
+.spido-badge.ok{background:#e8f5e9;color:#2e7d32}
+.spido-badge.warn{background:#fff3e0;color:#e65100}
+.spido-badge.bad{background:#fde8e8;color:#c0392b}
+.spido-streak{font-size:11px;color:#a0a0a0}
+.spido-streak b{color:#f59e0b}
+.spido-bar-wrap{height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.spido-bar{height:100%;border-radius:4px;transition:width .4s,background .3s}
+.spido-bar.ok{background:linear-gradient(90deg,#34d399,#16864e)}
+.spido-bar.warn{background:linear-gradient(90deg,#fbbf24,#d97706)}
+.spido-bar.bad{background:linear-gradient(90deg,#f87171,#c0392b)}
+.spido-footer{display:flex;justify-content:space-between;font-size:11px;color:#aaa}
+.spido-btns{display:flex;gap:6px;margin-top:12px}
+.spido-btn{flex:1;padding:5px 0;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid #e0ddd7;background:#fff;cursor:pointer;font-family:inherit;color:#6b6b6b;transition:all .15s}
+.spido-btn.active.ok{background:#16864e;border-color:#16864e;color:#fff}
+.spido-btn.active.warn{background:#d97706;border-color:#d97706;color:#fff}
+.spido-btn.active.bad{background:#c0392b;border-color:#c0392b;color:#fff}
+
+/* 3. Weekly challenge */
+.challenge-block{background:linear-gradient(135deg,#1a2035,#312e81);border-radius:12px;padding:18px 20px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.ch-noise{position:absolute;inset:0;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+.ch-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.ch-badge{font-size:10px;font-weight:600;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:6px;letter-spacing:.05em}
+.ch-days{font-size:11px;opacity:.5}
+.ch-title{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:4px}
+.ch-sub{font-size:12px;opacity:.55;margin-bottom:16px}
+.ch-progress-wrap{background:rgba(255,255,255,.12);border-radius:5px;height:8px;overflow:hidden;margin-bottom:8px}
+.ch-progress{height:100%;border-radius:5px;background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+.ch-footer{display:flex;justify-content:space-between;font-size:12px;opacity:.55;margin-bottom:12px}
+.ch-reward{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.ch-reward-icon{font-size:20px}
+.ch-reward-text{font-size:12px;font-weight:600}
+.ch-reward-sub{font-size:11px;opacity:.5;margin-top:1px}
+
+/* 4. Monthly scoring */
+.score-block{border:1px solid #e8e6e1;border-radius:12px;padding:16px 18px;margin-bottom:20px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+.score-grade{width:72px;height:72px;border-radius:16px;background:#1a2035;display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0}
+.score-letter{font-size:32px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em}
+.score-plus{font-size:16px;color:rgba(255,255,255,.5);margin-top:-4px}
+.score-body{padding-top:4px}
+.score-month{font-size:11px;color:#a0a0a0;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.score-title{font-size:15px;font-weight:600;margin-bottom:2px}
+.score-trend-row{font-size:11px;color:#16864e;font-weight:500;margin-bottom:12px}
+.score-factors{display:flex;flex-direction:column;gap:6px}
+.factor-row{display:flex;align-items:center;gap:10px}
+.factor-name{font-size:12px;color:#6b6b6b;width:150px;flex-shrink:0}
+.factor-bar-bg{flex:1;height:5px;background:#e8e6e1;border-radius:3px;overflow:hidden}
+.factor-bar-fill{height:100%;border-radius:3px}
+.fb-green{background:#66bb6a}.fb-blue{background:#5a9cf5}.fb-amber{background:#f59e0b}
+.factor-pct{font-size:11px;color:#a0a0a0;width:30px;text-align:right}
+.score-advice{margin-top:12px;background:#fef9ed;border-radius:8px;padding:9px 12px;font-size:12px;color:#78350f;border-left:3px solid #f59e0b}
+
+/* 5. Daily portfolio delta */
+.delta-metric{background:#1a2035;border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.delta-label{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:6px}
+.delta-val{font-size:24px;font-weight:700;letter-spacing:-.04em;line-height:1.1}
+.delta-val.up{color:#34d399}
+.delta-val.dn{color:#f87171}
+.delta-pct{font-size:13px;margin-top:4px}
+.delta-pct.up{color:#34d399}.delta-pct.dn{color:#f87171}
+.delta-ytd{font-size:11px;color:rgba(255,255,255,.35);margin-top:5px}
+.delta-sparkline{position:absolute;bottom:0;right:0;opacity:.2}
+
+/* 6. Market comparison - inline in portfolio block */
+.market-compare{background:#f0faf2;border-radius:8px;padding:10px 12px;margin-top:10px;display:flex;align-items:center;gap:10px}
+.mc-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.mc-ok{background:#dcfce7;color:#15803d}
+.mc-dn{background:#fee2e2;color:#991b1b}
+.mc-text{font-size:12px;color:#166534;flex:1;line-height:1.4}
+.mc-text.dn{color:#991b1b}
+
+/* 7. Total effect */
+.effect-block{background:#0f172a;border-radius:12px;padding:18px 20px;margin-bottom:20px;color:#fff}
+.effect-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.effect-title{font-size:14px;font-weight:600;opacity:.7}
+.effect-since{font-size:11px;opacity:.35}
+.effect-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.effect-item{background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.07)}
+.ei-label{font-size:10px;opacity:.45;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.ei-val{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.ei-val.teal{color:#34d399}.ei-val.blue{color:#60a5fa}.ei-val.amber{color:#fbbf24}.ei-val.red{color:#f87171}
+.ei-sub{font-size:10px;opacity:.35;margin-top:2px}
+.effect-total{background:rgba(255,255,255,.07);border-radius:10px;padding:11px 14px;border:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center}
+.et-label{font-size:12px;opacity:.55}
+.et-val{font-size:22px;font-weight:700;color:#34d399}
+
+/* 8. Net worth mini chart in metrics */
+.nw-sparkline{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:8px}
+.nw-bar{border-radius:2px 2px 0 0;background:#5a9cf5;flex:1;transition:height .3s}
+
+/* chart bars (simplified) */
+.chart-box{border:1px solid #e8e6e1;border-radius:12px;padding:20px;margin-bottom:20px}
+.legend{display:flex;gap:16px;margin-bottom:12px}
+.legend span{display:flex;align-items:center;gap:5px;font-size:12px;color:#888}
+.ldot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px}
+.bgroup{flex:1;display:flex;gap:3px;align-items:flex-end;justify-content:center}
+.bar{width:14px;border-radius:3px 3px 0 0}
+.bar-labels{display:flex;justify-content:space-around;margin-top:6px;font-size:10.5px;color:#aaa}
+.insight{background:#eff4ff;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
+.ins-title{font-size:14px;font-weight:500;color:#1e3a6e}
+.ins-sub{font-size:12.5px;color:#5a7fb8;margin-top:3px}
+.ins-btn{padding:8px 18px;background:#fff;border:1px solid #b8cfe8;border-radius:8px;font-size:13px;color:#2563eb;font-weight:500;cursor:pointer;font-family:inherit}
+
+/* home states */
+#home-newuser{display:block}
+#home-active,#home-investor{display:none}
+
+/* NEW: section divider label */
+.sec-divider{display:flex;align-items:center;gap:8px;margin-bottom:14px;margin-top:4px}
+.sec-divider-line{flex:1;height:1px;background:#e8e6e1}
+.sec-divider-label{font-size:11px;font-weight:500;color:#a0a0a0;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+.sec-divider-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.sdb-daily{background:#dbeafe;color:#1d4ed8}
+.sdb-weekly{background:#dcfce7;color:#15803d}
+.sdb-monthly{background:#fef3c7;color:#b45309}
+
+/* Robo card */
+.robo-card{padding:16px 18px;background:#f8faff;border:1px solid #c5d8f5;border-radius:12px;position:relative}
+.robo-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#2563eb;background:#dbeafe;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+.robo-title{font-size:16px;font-weight:600;color:#1e3a6e;margin-bottom:4px}
+.robo-sub{font-size:13px;color:#5a7fb8;line-height:1.5;margin-bottom:14px}
+.robo-cta{padding:10px 20px;border-radius:10px;border:none;background:#2563eb;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon"></div><span class="logo-text">WhiteSwan</span></div>
+  <div class="quick-add"><button class="quick-add-btn">+ Добавить</button></div>
+  <nav class="nav">
+    <div class="nav-item active">Главная</div>
+    <div class="nav-item">Все деньги</div>
+    <div class="nav-item">Активы и долги</div>
+    <div class="nav-item">Планы и цели</div>
+    <div class="nav-item">Инвестиции</div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" style="font-size:13px;color:#a0a0a0">Настройки</div>
+  </nav>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- State switcher -->
+  <div class="demo-toggle">
+    <button class="demo-opt active" onclick="showState('newuser',this)">Новичок</button>
+    <button class="demo-opt" onclick="showState('active',this)">Активный</button>
+    <button class="demo-opt" onclick="showState('investor',this)">Инвестор</button>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       НОВИЧОК
+       ═══════════════════════════════════ -->
+  <div id="home-newuser">
+    <div class="top-bar">
+      <div><div class="greeting">Добро пожаловать, Игорь</div><h1 class="page-title">Главная</h1></div>
+      <button class="btn btn-p" style="font-size:13px;padding:8px 18px">Пройти онбординг</button>
+    </div>
+
+    <!-- Маскот — привязан к шагам онбординга -->
+    <div style="background:#fffbeb;border:1px solid #f0d882;border-radius:12px;padding:18px 20px;margin-bottom:20px">
+      <div style="display:flex;gap:20px;align-items:center">
+        <div style="flex-shrink:0;text-align:center;width:64px">
+          <div style="font-size:48px;line-height:1;margin-bottom:6px">🦢</div>
+          <div style="font-size:10px;font-weight:600;color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:6px;white-space:nowrap;display:inline-block">Ур. 1</div>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+            <div style="font-size:15px;font-weight:600;color:#92400e">Лебедь Финн голодает</div>
+            <div style="font-size:12px;color:#b45309">заполни шаги, чтобы его накормить</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <div style="height:5px;border-radius:3px;background:#f59e0b;flex:1"></div>
+            <div style="height:5px;border-radius:3px;background:#f0d882;flex:1"></div>
+            <div style="height:5px;border-radius:3px;background:#f0d882;flex:1"></div>
+            <div style="height:5px;border-radius:3px;background:#f0d882;flex:1"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <div style="padding:8px 10px;background:#fff8e1;border:1.5px solid #66bb6a;border-radius:8px">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                <div style="width:16px;height:16px;border-radius:4px;background:#66bb6a;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;flex-shrink:0">✓</div>
+                <div style="font-size:12px;font-weight:600;color:#2e7d32">Точка 0</div>
+              </div>
+              <div style="font-size:11px;color:#a0a0a0">Счёт добавлен</div>
+            </div>
+            <div style="padding:8px 10px;background:#fff;border:1.5px solid #2563eb;border-radius:8px">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                <div style="width:16px;height:16px;border-radius:4px;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;flex-shrink:0">2</div>
+                <div style="font-size:12px;font-weight:600;color:#1e3a6e">Бюджет</div>
+              </div>
+              <div style="font-size:11px;color:#2563eb">← сейчас</div>
+            </div>
+            <div style="padding:8px 10px;background:#fafaf8;border:1px solid #e8e6e1;border-radius:8px;opacity:.6">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                <div style="width:16px;height:16px;border-radius:4px;background:#e8e6e1;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;flex-shrink:0">3</div>
+                <div style="font-size:12px;font-weight:500;color:#6b6b6b">Финплан</div>
+              </div>
+              <div style="font-size:11px;color:#a0a0a0">+25 XP</div>
+            </div>
+            <div style="padding:8px 10px;background:#fafaf8;border:1px solid #e8e6e1;border-radius:8px;opacity:.6">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+                <div style="width:16px;height:16px;border-radius:4px;background:#e8e6e1;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;flex-shrink:0">4</div>
+                <div style="font-size:12px;font-weight:500;color:#6b6b6b">Цель</div>
+              </div>
+              <div style="font-size:11px;color:#a0a0a0">+25 XP</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;padding-left:4px">
+          <div style="font-size:11px;color:#b45309;margin-bottom:8px;font-weight:500">Сытость</div>
+          <div style="width:10px;height:72px;background:#f0d882;border-radius:5px;overflow:hidden;margin:0 auto 6px;display:flex;flex-direction:column;justify-content:flex-end">
+            <div style="height:25%;background:#f59e0b;border-radius:5px"></div>
+          </div>
+          <div style="font-size:12px;color:#92400e;font-weight:600">1 / 4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Метрики (пустые, существующее) -->
+    <div class="metrics m3">
+      <div class="metric empty">
+        <div class="mq">?</div>
+        <div class="ml">Свободно сейчас</div>
+        <div class="mv" style="font-size:22px;color:#d0cdc6;font-weight:500">54 ₽</div>
+        <div class="ms">Только наличные</div>
+        <div class="mlink">Подключите банк</div>
+      </div>
+      <div class="metric empty">
+        <div class="ml">За месяц</div>
+        <div class="mv ph">— ₽</div>
+        <div class="ms">Нет данных</div>
+        <div class="mlink">Добавьте транзакции</div>
+      </div>
+      <div class="metric empty">
+        <div class="ml">Капитал</div>
+        <div class="mv ph">— ₽</div>
+        <div class="ms">Добавьте активы</div>
+        <div class="mlink">Заполнить</div>
+      </div>
+    </div>
+
+    <!-- Что дальше (существующее) -->
+    <div class="actions-box">
+      <div class="actions-title">Что дальше</div>
+      <div class="aitem blue"><div class="adot blue"></div><div class="acontent"><b>Подключите банк</b><div class="asub">Транзакции загрузятся автоматически</div></div><div class="abtn">Подключить</div></div>
+      <div class="aitem green"><div class="adot green"></div><div class="acontent"><b>Добавьте активы и обязательства</b><div class="asub">Для расчёта чистого капитала</div></div><div class="abtn">Добавить</div></div>
+      <div class="aitem purple"><div class="adot purple"></div><div class="acontent"><b>Постройте финансовый план</b><div class="asub">Прогноз капитала на 5–20 лет</div></div><div class="abtn">Создать</div></div>
+    </div>
+
+    <!-- Empty states (существующее) -->
+    <div class="two-col">
+      <div class="block dashed">
+        <div style="font-size:14px;font-weight:500;margin-bottom:4px">Цели</div>
+        <div style="font-size:12.5px;color:#a0a0a0;margin-bottom:14px;max-width:240px">Поставьте финансовую цель и отслеживайте прогресс</div>
+        <button class="btn btn-p" style="font-size:13px;padding:8px 18px">Создать первую цель</button>
+      </div>
+      <div class="block dashed">
+        <div style="font-size:14px;font-weight:500;margin-bottom:4px">Инвестиции</div>
+        <div style="font-size:12.5px;color:#a0a0a0;margin-bottom:14px;max-width:240px">Когда появится излишек — RoboAdvisor подберёт стратегию</div>
+        <button class="btn btn-s" style="font-size:13px;padding:8px 18px">Узнать больше</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       АКТИВНЫЙ
+       ═══════════════════════════════════ -->
+  <div id="home-active" style="display:none">
+    <div class="top-bar">
+      <div><div class="greeting">Март 2026</div><h1 class="page-title">Главная</h1></div>
+      <div class="sync-bar"><div class="sdot"></div>Актуально <span class="stime">12 мин назад</span></div>
+    </div>
+
+    <!-- Маскот — стрик + бюджет + челлендж -->
+    <div style="background:#fffbeb;border:1px solid #f0d882;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;gap:20px;align-items:center">
+      <div style="flex-shrink:0;text-align:center;width:64px">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🦢</div>
+        <div style="font-size:10px;font-weight:600;color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:6px;white-space:nowrap;display:inline-block">Ур. 4</div>
+      </div>
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:16px;align-items:center">
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Стрик</div>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:6px">
+            <span style="font-size:28px;font-weight:700;color:#f59e0b;letter-spacing:-.02em;line-height:1">7</span>
+            <span style="font-size:13px;color:#b45309">дней 🔥</span>
+          </div>
+          <div style="display:flex;gap:3px">
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">✓</div>
+            <div style="width:20px;height:20px;border-radius:5px;border:1.5px solid #f59e0b;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#f59e0b;font-weight:700">!</div>
+          </div>
+        </div>
+        <div style="width:1px;height:48px;background:#f0d882"></div>
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Бюджет сегодня</div>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:8px">
+            <span style="font-size:22px;font-weight:700;color:#16864e;letter-spacing:-.02em;line-height:1">1 584 ₽</span>
+            <span style="font-size:12px;color:#a0a0a0">осталось</span>
+          </div>
+          <div style="height:5px;background:#e8e6e1;border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:43%;background:#66bb6a;border-radius:3px"></div>
+          </div>
+          <div style="font-size:10px;color:#a0a0a0;margin-top:3px">из 2 800 ₽ на день</div>
+        </div>
+        <div style="width:1px;height:48px;background:#f0d882"></div>
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Челлендж недели</div>
+          <div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:6px">Рестораны до 3 000 ₽</div>
+          <div style="height:5px;background:#e8e6e1;border-radius:3px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;width:52%;background:#9575cd;border-radius:3px"></div>
+          </div>
+          <div style="font-size:10px;color:#a0a0a0">1 560 ₽ из 3 000 ₽ · осталось 4 дня</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;text-align:center;padding-left:4px">
+        <div style="font-size:11px;color:#b45309;margin-bottom:4px;font-weight:500">XP</div>
+        <div style="font-size:22px;font-weight:700;color:#f59e0b;letter-spacing:-.02em;line-height:1">68</div>
+        <div style="font-size:10px;color:#b45309;margin-top:1px">/ 100</div>
+        <div style="width:32px;height:4px;background:#f0d882;border-radius:2px;overflow:hidden;margin:5px auto 0">
+          <div style="height:100%;width:68%;background:#f59e0b;border-radius:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-divider">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-label">Сегодня</span>
+      <span class="sec-divider-badge sdb-daily">Ежедневно</span>
+      <div class="sec-divider-line"></div>
+    </div>
+
+    <div class="spido-block s-ok" id="spidoBlock">
+      <div class="spido-top">
+        <div>
+          <div class="spido-label">Бюджет на сегодня, 28 марта</div>
+          <div class="spido-amount s-ok" id="spidoAmount">1 584 ₽</div>
+          <div class="spido-sub" id="spidoSub">осталось · потрачено 1 216 ₽ из 2 800 ₽</div>
+        </div>
+        <div class="spido-status">
+          <div class="spido-badge ok" id="spidoBadge">✓ В зелёной зоне</div>
+          <div class="spido-streak">🔥 <b>7</b> дней в норме</div>
+          <div style="font-size:11px;color:#aaa;margin-top:4px">Ранрейт к 31 мар: <b style="color:#16864e">+52 000 ₽</b></div>
+        </div>
+      </div>
+      <div class="spido-bar-wrap"><div class="spido-bar ok" id="spidoBar" style="width:43%"></div></div>
+      <div class="spido-footer">
+        <span>0 ₽</span>
+        <span id="spidoLimit">Лимит 2 800 ₽/день</span>
+      </div>
+      <!-- Интерактив: демо состояний -->
+      <div class="spido-btns">
+        <button class="spido-btn active ok" onclick="setSpido('ok',this)">🟢 В норме</button>
+        <button class="spido-btn" onclick="setSpido('warn',this)">🟡 На грани</button>
+        <button class="spido-btn" onclick="setSpido('bad',this)">🔴 Перерасход</button>
+      </div>
+    </div>
+
+    <!-- Метрики (существующее + улучшенное) -->
+    <div class="metrics m3" style="margin-bottom:20px">
+      <div class="metric">
+        <div class="mq">?</div>
+        <div class="ml">Свободно сейчас</div>
+        <div class="mv g">275 100 ₽</div>
+        <div class="ms">Счета 297 500 − платежи 22 400</div>
+        <!-- NEW: контекст-оценка -->
+        <span class="ctx-badge ctx-ok">✓ В норме для финплана</span>
+        <div class="mlink">Деньги → Бюджет</div>
+      </div>
+      <div class="metric">
+        <div class="ml">За месяц</div>
+        <div style="display:flex;gap:14px;margin-top:2px">
+          <div><div style="font-size:11px;color:#16864e">Доходы</div><div style="font-size:17px;font-weight:600;color:#16864e">+135 000</div></div>
+          <div><div style="font-size:11px;color:#c0392b">Расходы</div><div style="font-size:17px;font-weight:600;color:#c0392b">−87 460</div></div>
+          <div><div style="font-size:11px;color:#888">Δ</div><div style="font-size:17px;font-weight:600">+47 540</div></div>
+        </div>
+        <!-- NEW: мини-спарклайн -->
+        <div class="nw-sparkline">
+          <div class="nw-bar" style="height:12px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:14px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:16px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:13px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:18px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:20px;background:#e8e6e1"></div>
+          <div class="nw-bar" style="height:22px;background:#5a9cf5"></div>
+          <div class="nw-bar" style="height:28px;background:#2563eb"></div>
+        </div>
+        <div class="mlink">Деньги → Бюджет</div>
+      </div>
+      <div class="metric">
+        <div class="ml">Капитал</div>
+        <div class="mv">4 615 000 ₽</div>
+        <div class="trend">↑ +2.8% за март</div>
+        <!-- NEW: Net Worth sparkline -->
+        <div class="nw-sparkline">
+          <div class="nw-bar" style="height:10px"></div>
+          <div class="nw-bar" style="height:12px"></div>
+          <div class="nw-bar" style="height:14px"></div>
+          <div class="nw-bar" style="height:16px"></div>
+          <div class="nw-bar" style="height:18px"></div>
+          <div class="nw-bar" style="height:21px"></div>
+          <div class="nw-bar" style="height:24px"></div>
+          <div class="nw-bar" style="height:28px"></div>
+        </div>
+        <div class="mlink">Активы и долги</div>
+      </div>
+    </div>
+
+    <!-- Что дальше (существующее + статусы платежей NEW) -->
+    <div class="actions-box">
+      <div class="actions-title">Что дальше <span style="font-size:12px;color:#a0a0a0;font-weight:400">4 пункта</span></div>
+      <div class="aitem red"><div class="adot red"></div><div class="acontent"><b>Взнос «Подушка» просрочен</b> — 10 000 ₽<div class="asub">Дедлайн был 15 марта</div></div><div class="abtn">Оплатить</div></div>
+      <!-- NEW: статусы "хватит / не хватает" -->
+      <div class="aitem orange"><div class="adot orange"></div><div class="acontent"><b>Автокредит</b> — 12 400 ₽ через 2 дня<div class="asub">Счёт: Сбербанк</div></div>
+        <span class="astatus ok">На счёте хватит</span>
+      </div>
+      <div class="aitem orange"><div class="adot orange"></div><div class="acontent"><b>Рестораны</b> +67% к плану<div class="asub">15 060 из 9 000 запланированных</div></div><div class="abtn">Бюджет</div></div>
+      <div class="aitem blue"><div class="adot blue"></div><div class="acontent"><b>Ипотека</b> — 21 800 ₽ через 3 дня<div class="asub">31 марта</div></div>
+        <span class="astatus ok">На счёте хватит</span>
+      </div>
+    </div>
+
+    <!-- NEW: Недельный челлендж -->
+    <div class="sec-divider">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-label">На этой неделе</span>
+      <span class="sec-divider-badge sdb-weekly">Еженедельно</span>
+      <div class="sec-divider-line"></div>
+    </div>
+    <div class="challenge-block">
+      <div class="ch-noise"></div>
+      <div class="ch-header">
+        <span class="ch-badge">АВТО-ЧЕЛЛЕНДЖ</span>
+        <span class="ch-days">25–31 марта</span>
+      </div>
+      <div class="ch-title">Рестораны до 3 000 ₽</div>
+      <div class="ch-sub">На прошлой неделе: 4 200 ₽ — можешь меньше</div>
+      <div class="ch-progress-wrap"><div class="ch-progress" style="width:52%"></div></div>
+      <div class="ch-footer"><span>Потрачено: 1 560 ₽</span><span>Осталось: 1 440 ₽</span></div>
+      <div class="ch-reward">
+        <div class="ch-reward-icon">🏆</div>
+        <div>
+          <div class="ch-reward-text">Выполни → +50 XP для Финна</div>
+          <div class="ch-reward-sub">и бейдж «Ресторатор-скряга»</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Цели + RoboAdvisor тизер -->
+    <div class="two-col">
+      <div class="block">
+        <div class="bh"><div class="bt">Цели</div><span class="blink">Все →</span></div>
+        <div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Отпуск</span><span style="font-size:12px;color:#2e7d32;font-weight:500">68%</span></div><div class="goal-bar"><div class="goal-fill ok" style="width:68%"></div></div><div style="font-size:11px;color:#aaa">102 000 из 150 000 · +7 800 ₽ за неделю ↑</div></div>
+        <div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Подушка безопасности</span><span style="font-size:12px;color:#c0392b;font-weight:500">34%</span></div><div class="goal-bar"><div class="goal-fill behind" style="width:34%"></div></div><div style="font-size:11px;color:#aaa">170 000 из 500 000 · отстаёт от плана</div></div>
+      </div>
+      <div class="block">
+        <div class="bh"><div class="bt">RoboAdvisor</div></div>
+        <div style="font-size:13px;color:#5a7fb8;margin-bottom:14px;line-height:1.5">Стабильный излишек <b style="color:#1e3a6e">~70 000 ₽/мес</b> — деньги лежат без дела</div>
+        <button style="padding:9px 18px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;width:100%">Бесплатная оценка риск-профиля →</button>
+      </div>
+    </div>
+
+    <!-- RoboAdvisor тизер (существующее) -->
+    <div class="insight" style="margin-top:14px">
+      <div><div class="ins-title">Стабильный излишек ~70 000 ₽/мес</div><div class="ins-sub">Деньги лежат без дела — бесплатная оценка риск-профиля</div></div>
+      <button class="ins-btn">Оценить →</button>
+    </div>
+
+    <!-- NEW: Скоринг месяца (1-го числа) -->
+    <div class="sec-divider">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-label">Итог марта</span>
+      <span class="sec-divider-badge sdb-monthly">Ежемесячно · 1 апреля</span>
+      <div class="sec-divider-line"></div>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e6e1;border-radius:12px;padding:18px 20px">
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px">
+        <div style="width:68px;height:68px;border-radius:12px;background:#1a2035;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="font-size:30px;font-weight:600;color:#fff;line-height:1">B</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:1px">+</div>
+        </div>
+        <div style="flex:1;padding-top:4px">
+          <div style="font-size:11px;color:#a0a0a0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Март 2026</div>
+          <div style="font-size:16px;font-weight:500;margin-bottom:2px">Хороший месяц</div>
+          <div style="font-size:12px;color:#16864e">↑ Растёшь: февраль был B−</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:#a0a0a0;margin-bottom:3px">Итого баллов</div>
+          <div style="display:flex;align-items:baseline;gap:3px;justify-content:flex-end">
+            <span style="font-size:28px;font-weight:500;color:#1a1a1a">79</span>
+            <span style="font-size:14px;color:#a0a0a0">/ 100</span>
+          </div>
+          <div style="font-size:11px;color:#a0a0a0;margin-top:2px">до A−: нужно <b style="color:#1a1a1a;font-weight:500">85+</b></div>
+        </div>
+      </div>
+      <div style="height:1px;background:#e8e6e1;margin-bottom:14px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:12px;color:#a0a0a0">Из чего сложились баллы</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#a0a0a0">
+          <div style="width:14px;height:2px;background:#a0a0a0;opacity:.4;border-radius:1px"></div>
+          <span>порог A (85 баллов)</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Бюджет выдержан</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:82%;background:#66bb6a;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#16864e">32.8 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 40</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Цели по плану</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:75%;background:#5a9cf5;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#185FA5">22.5 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 30</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Капитал растёт</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:91%;background:#66bb6a;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#16864e">18.2 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 20</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Долги сокращаются</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:55%;background:#f59e0b;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#92400e">5.5 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 10</span></div>
+        </div>
+      </div>
+      <div style="background:#fef9ed;padding:9px 12px;font-size:13px;color:#78350f;border-left:3px solid #f59e0b;border-radius:0">
+        <b style="font-weight:500">До A−:</b> сократить рестораны на 6 000 ₽ (+3.6 балла) и внести взнос по подушке (+2.0 балла)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════
+       ИНВЕСТОР
+       ═══════════════════════════════════ -->
+  <div id="home-investor" style="display:none">
+    <div class="top-bar">
+      <div><div class="greeting">Март 2026</div><h1 class="page-title">Главная</h1></div>
+      <div class="sync-bar"><div class="sdot"></div>Данные актуальны <span class="stime">5 мин назад</span></div>
+    </div>
+
+    <!-- Маскот — длинный стрик + достижение + следующий уровень -->
+    <div style="background:#fffbeb;border:1px solid #f0d882;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;gap:20px;align-items:center">
+      <div style="flex-shrink:0;text-align:center;width:64px">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🦢</div>
+        <div style="font-size:10px;font-weight:600;color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:6px;white-space:nowrap;display:inline-block">Ур. 7</div>
+      </div>
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:16px;align-items:center">
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Стрик — рекорд!</div>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:4px">
+            <span style="font-size:28px;font-weight:700;color:#f59e0b;letter-spacing:-.02em;line-height:1">23</span>
+            <span style="font-size:13px;color:#b45309">дня 🔥</span>
+          </div>
+          <div style="font-size:11px;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:5px;display:inline-block">Личный рекорд 🏆</div>
+        </div>
+        <div style="width:1px;height:48px;background:#f0d882"></div>
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Март: оценка A−</div>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:6px">
+            <span style="font-size:28px;font-weight:700;color:#1a2035;letter-spacing:-.02em;line-height:1">88</span>
+            <span style="font-size:13px;color:#a0a0a0">/ 100</span>
+          </div>
+          <div style="font-size:11px;color:#16864e">↑ лучший месяц за полгода</div>
+        </div>
+        <div style="width:1px;height:48px;background:#f0d882"></div>
+        <div>
+          <div style="font-size:11px;color:#b45309;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">До уровня 8</div>
+          <div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:6px">Осталось 32 XP</div>
+          <div style="height:5px;background:#f0d882;border-radius:3px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;width:68%;background:#f59e0b;border-radius:3px"></div>
+          </div>
+          <div style="font-size:10px;color:#a0a0a0">68 / 100 XP · Инвестор-профи</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;padding-left:4px">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;width:72px">
+          <div style="font-size:16px;line-height:1" title="Бережливый">🏅</div>
+          <div style="font-size:16px;line-height:1" title="Точный">🎯</div>
+          <div style="font-size:16px;line-height:1" title="Стрик">🔥</div>
+          <div style="font-size:16px;line-height:1" title="Инвестор">📈</div>
+          <div style="font-size:16px;line-height:1" title="Вкладчик">💎</div>
+          <div style="font-size:16px;line-height:1;opacity:.3">🔒</div>
+        </div>
+        <div style="font-size:10px;color:#b45309;margin-top:5px;text-align:center">5 / 12 бейджей</div>
+      </div>
+    </div>
+
+    <!-- NEW: 4 метрики — добавлена дельта портфеля вчера -->
+    <div class="sec-divider">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-label">Сегодняшний снимок</span>
+      <span class="sec-divider-badge sdb-daily">Ежедневно</span>
+      <div class="sec-divider-line"></div>
+    </div>
+    <div class="metrics m4">
+      <div class="metric">
+        <div class="mq">?</div>
+        <div class="ml">Свободно сейчас</div>
+        <div class="mv g">312 400 ₽</div>
+        <div class="ms">Счета 341 200 − платежи 28 800</div>
+        <span class="ctx-badge ctx-ok">✓ Выше нормы</span>
+        <div class="mlink">Деньги → Бюджет</div>
+      </div>
+      <div class="metric">
+        <div class="ml">За месяц</div>
+        <div style="display:flex;gap:12px;margin-top:2px">
+          <div><div style="font-size:11px;color:#16864e">Доходы</div><div style="font-size:16px;font-weight:600;color:#16864e">+185 000</div></div>
+          <div><div style="font-size:11px;color:#c0392b">Расходы</div><div style="font-size:16px;font-weight:600;color:#c0392b">−94 300</div></div>
+          <div><div style="font-size:11px;color:#888">Δ</div><div style="font-size:16px;font-weight:600">+90 700</div></div>
+        </div>
+        <div class="mlink">Деньги → Бюджет</div>
+      </div>
+      <!-- NEW: Дельта портфеля за вчера -->
+      <div class="delta-metric">
+        <svg class="delta-sparkline" width="80" height="50" viewBox="0 0 80 50">
+          <polyline points="0,45 14,38 28,32 42,28 56,18 70,12 80,8" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="delta-label">Портфель вчера</div>
+        <div class="delta-val up">+2 340 ₽</div>
+        <div class="delta-pct up">+0.4% за день</div>
+        <div class="delta-ytd">С начала года: +86 000 ₽ (+9.2%)</div>
+      </div>
+      <div class="metric">
+        <div class="ml">Капитал</div>
+        <div class="mv">15 328 000 ₽</div>
+        <div class="trend">↑ +4.1% за март</div>
+        <div class="nw-sparkline">
+          <div class="nw-bar" style="height:8px"></div><div class="nw-bar" style="height:10px"></div>
+          <div class="nw-bar" style="height:12px"></div><div class="nw-bar" style="height:14px"></div>
+          <div class="nw-bar" style="height:16px"></div><div class="nw-bar" style="height:20px"></div>
+          <div class="nw-bar" style="height:24px"></div><div class="nw-bar" style="height:28px"></div>
+        </div>
+        <div class="mlink">Активы и долги</div>
+      </div>
+    </div>
+
+    <!-- Что дальше (существующее) -->
+    <div class="actions-box">
+      <div class="actions-title">Что дальше <span style="font-size:12px;color:#a0a0a0;font-weight:400">3 пункта</span></div>
+      <div class="aitem purple"><div class="adot purple"></div><div class="acontent"><b>2 рекомендации RoboAdvisor</b><div class="asub">Увеличить облигации, зафиксировать Сбербанк</div></div><div class="abtn">Применить</div></div>
+      <div class="aitem orange"><div class="adot orange"></div><div class="acontent"><b>Ипотека</b> — 21 800 ₽ через 5 дней</div>
+        <span class="astatus ok">На счёте хватит</span>
+      </div>
+      <div class="aitem green"><div class="adot green"></div><div class="acontent"><b>Дивиденды +4 200 ₽</b> зачислены<div class="asub">Сбербанк, 19 марта</div></div><div class="abtn">Портфель</div></div>
+    </div>
+
+    <!-- 3 колонки: Цели / Портфель+сравнение с рынком / RoboAdvisor -->
+    <div class="three-col">
+      <div class="block">
+        <div class="bh"><div class="bt">Цели</div><span class="blink">Все →</span></div>
+        <div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Автомобиль</span><span style="font-size:12px;font-weight:500;color:#2e7d32">72%</span></div><div class="goal-bar"><div class="goal-fill ok" style="width:72%"></div></div><div style="font-size:11px;color:#aaa">2 160 000 из 3 000 000</div></div>
+        <div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Отпуск</span><span style="font-size:12px;font-weight:500;color:#2e7d32">68%</span></div><div class="goal-bar"><div class="goal-fill ok" style="width:68%"></div></div><div style="font-size:11px;color:#aaa">102 000 из 150 000</div></div>
+        <div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Подушка</span><span style="font-size:12px;font-weight:500;color:#c0392b">34%</span></div><div class="goal-bar"><div class="goal-fill behind" style="width:34%"></div></div><div style="font-size:11px;color:#aaa">170 000 из 500 000</div></div>
+      </div>
+
+      <div class="block">
+        <div class="bh"><div class="bt">Портфель</div><span class="blink">Подробнее →</span></div>
+        <div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:#888">Стоимость</span><div><div style="font-size:18px;font-weight:600">10 072 000 ₽</div><div style="font-size:11px;color:#16864e;text-align:right">+5.3% с нач. года</div></div></div></div>
+        <div style="font-size:12.5px;padding:0 4px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8"><span>Акции</span><span style="font-weight:500">48.5%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8"><span>Облигации</span><span style="font-weight:500">25.3%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8"><span>Фонды</span><span style="font-weight:500">23.1%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span>Кэш</span><span style="font-weight:500">3.1%</span></div>
+        </div>
+        <!-- NEW: Сравнение с рынком -->
+        <div class="market-compare">
+          <span class="mc-badge mc-ok">↑ +1.4%</span>
+          <div class="mc-text">Твой портфель <b>+2.8%</b> — обогнал МосБиржу на <b>+1.4%</b> в марте 🏆</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:14px 16px;background:#f5f0ff;border:1px solid #e0d5f5;border-radius:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;font-weight:500;color:#5e35b1;background:#ede7f6;padding:3px 10px;border-radius:6px">RoboAdvisor</span><span style="font-size:11px;color:#7e57c2">Активен</span></div>
+          <div style="background:#fff;border-radius:8px;padding:8px 10px;border:.5px solid #e0d5f5;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span>Увеличить облигации до 30%</span><span style="color:#5e35b1;font-weight:500;cursor:pointer">Применить</span></div>
+          <div style="background:#fff;border-radius:8px;padding:8px 10px;border:.5px solid #e0d5f5;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span>Зафиксировать Сбербанк (+32%)</span><span style="color:#5e35b1;font-weight:500;cursor:pointer">Детали</span></div>
+        </div>
+        <div class="block" style="flex:1">
+          <div class="bh"><div class="bt" style="font-size:14px">Последние события</div></div>
+          <div style="font-size:12.5px">
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="width:6px;height:6px;border-radius:50%;background:#66bb6a;flex-shrink:0"></span><span style="flex:1">Дивиденды Сбербанк</span><span style="color:#16864e;font-weight:500">+4 200 ₽</span></div>
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="width:6px;height:6px;border-radius:50%;background:#5a9cf5;flex-shrink:0"></span><span style="flex:1">Купоны ОФЗ 26230</span><span style="color:#16864e;font-weight:500">+3 800 ₽</span></div>
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="width:6px;height:6px;border-radius:50%;background:#e6a817;flex-shrink:0"></span><span style="flex:1">Пополнение брокерского</span><span style="color:#888">60 000 ₽</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: Общий эффект с начала использования -->
+    <div class="sec-divider" style="margin-top:4px">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-label">Эффект от работы с сервисом</span>
+      <span class="sec-divider-badge sdb-monthly">Ежемесячно</span>
+      <div class="sec-divider-line"></div>
+    </div>
+    <div class="effect-block">
+      <div class="effect-head">
+        <div class="effect-title">С момента регистрации</div>
+        <div class="effect-since">март 2025 → март 2026 · 12 месяцев</div>
+      </div>
+      <div class="effect-grid">
+        <div class="effect-item"><div class="ei-label">Общий доход</div><div class="ei-val blue">1 620 000 ₽</div><div class="ei-sub">за 12 месяцев</div></div>
+        <div class="effect-item"><div class="ei-label">Накоплено на цели</div><div class="ei-val teal">312 000 ₽</div><div class="ei-sub">4 активные цели</div></div>
+        <div class="effect-item"><div class="ei-label">Инвестиции принесли</div><div class="ei-val amber">+86 000 ₽</div><div class="ei-sub">доходность 9.2%</div></div>
+        <div class="effect-item"><div class="ei-label">Погашено долгов</div><div class="ei-val red">261 600 ₽</div><div class="ei-sub">−4.1% от тела</div></div>
+      </div>
+      <div class="effect-total">
+        <div class="et-label">Чистый прирост капитала за год</div>
+        <div class="et-val">+659 600 ₽</div>
+      </div>
+    </div>
+
+    <!-- Скоринг месяца -->
+    <div style="background:#fff;border:1px solid #e8e6e1;border-radius:12px;padding:18px 20px">
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px">
+        <div style="width:68px;height:68px;border-radius:12px;background:#1a2035;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="font-size:30px;font-weight:600;color:#fff;line-height:1">A</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:1px">−</div>
+        </div>
+        <div style="flex:1;padding-top:4px">
+          <div style="font-size:11px;color:#a0a0a0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Март 2026</div>
+          <div style="font-size:16px;font-weight:500;margin-bottom:2px">Отличный месяц</div>
+          <div style="font-size:12px;color:#16864e">↑ Рекорд: лучший месяц за полгода</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:#a0a0a0;margin-bottom:3px">Итого баллов</div>
+          <div style="display:flex;align-items:baseline;gap:3px;justify-content:flex-end">
+            <span style="font-size:28px;font-weight:500;color:#1a1a1a">88</span>
+            <span style="font-size:14px;color:#a0a0a0">/ 100</span>
+          </div>
+          <div style="font-size:11px;color:#16864e;margin-top:2px">↑ порог A пройден</div>
+        </div>
+      </div>
+      <div style="height:1px;background:#e8e6e1;margin-bottom:14px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:12px;color:#a0a0a0">Из чего сложились баллы</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#a0a0a0">
+          <div style="width:14px;height:2px;background:#a0a0a0;opacity:.4;border-radius:1px"></div>
+          <span>порог A (85 баллов)</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Бюджет выдержан</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:92%;background:#66bb6a;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#16864e">36.8 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 40</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Цели по плану</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:88%;background:#66bb6a;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#16864e">26.4 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 30</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Капитал растёт</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:95%;background:#5a9cf5;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#185FA5">19.0 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 20</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:13px;color:#6b6b6b;width:168px;flex-shrink:0">Долги сокращаются</div>
+          <div style="flex:1;height:8px;background:#e8e6e1;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:-3px;left:85%;width:2px;height:14px;background:#a0a0a0;opacity:.3;border-radius:1px"></div>
+            <div style="height:100%;width:78%;background:#f59e0b;border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;font-weight:500;width:52px;text-align:right;white-space:nowrap;color:#92400e">7.8 <span style="font-size:11px;color:#a0a0a0;font-weight:400">/ 10</span></div>
+        </div>
+      </div>
+      <div style="background:#f0faf2;padding:9px 12px;font-size:13px;color:#166534;border-left:3px solid #66bb6a;border-radius:0">
+        <b style="font-weight:500">Совет апреля:</b> внести досрочный взнос по ипотеке (+0.8 балла) — сэкономишь 2 месяца переплаты
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+function showState(state, btn) {
+  document.querySelectorAll('.demo-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['newuser','active','investor'].forEach(s => {
+    document.getElementById('home-'+s).style.display = s === state ? 'block' : 'none';
+  });
+}
+
+// Spidometer states
+const spidoStates = {
+  ok: {
+    blockClass:'s-ok', amountClass:'s-ok', barClass:'ok', badgeClass:'ok',
+    amount:'1 584 ₽', sub:'осталось · потрачено 1 216 ₽ из 2 800 ₽',
+    badge:'✓ В зелёной зоне', barW:'43%'
+  },
+  warn: {
+    blockClass:'s-warn', amountClass:'s-warn', barClass:'warn', badgeClass:'warn',
+    amount:'320 ₽', sub:'почти лимит · потрачено 2 480 ₽ из 2 800 ₽',
+    badge:'⚠ На грани', barW:'89%'
+  },
+  bad: {
+    blockClass:'s-bad', amountClass:'s-bad', barClass:'bad', badgeClass:'bad',
+    amount:'−430 ₽', sub:'перерасход · потрачено 3 230 ₽ из 2 800 ₽',
+    badge:'✕ Перерасход', barW:'100%'
+  }
+};
+
+function setSpido(state, clickedBtn) {
+  const s = spidoStates[state];
+  const block = document.getElementById('spidoBlock');
+  block.className = 'spido-block ' + s.blockClass;
+  const amt = document.getElementById('spidoAmount');
+  amt.className = 'spido-amount ' + s.amountClass;
+  amt.textContent = s.amount;
+  document.getElementById('spidoSub').textContent = s.sub;
+  document.getElementById('spidoBadge').className = 'spido-badge ' + s.badgeClass;
+  document.getElementById('spidoBadge').textContent = s.badge;
+  const bar = document.getElementById('spidoBar');
+  bar.className = 'spido-bar ' + s.barClass;
+  bar.style.width = s.barW;
+  document.querySelectorAll('.spido-btn').forEach(b => { b.classList.remove('active','ok','warn','bad'); });
+  clickedBtn.classList.add('active', state);
+}
+</script>
+</body>
+</html>

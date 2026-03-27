@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhiteSwan — Финплан v2</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans',sans-serif;background:#f5f5f3;color:#1a1a1a;-webkit-font-smoothing:antialiased}
+.shell{display:flex;height:100vh;max-width:1280px;margin:0 auto;background:#fff;border-left:1px solid #e8e6e1;border-right:1px solid #e8e6e1}
+.sidebar{width:220px;border-right:1px solid #e8e6e1;padding:28px 0;flex-shrink:0;display:flex;flex-direction:column}
+.logo{padding:0 20px 28px;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a7bd5,#00d2ff)}
+.logo-text{font-size:14px;font-weight:600;letter-spacing:-.3px}
+.nav-item{display:block;padding:10px 20px;font-size:14px;color:#6b6b6b;cursor:pointer;border-left:3px solid transparent}
+.nav-item.active{color:#2563eb;font-weight:500;border-left-color:#2563eb;background:#eff4ff}
+.nav-sep{height:1px;background:#e8e6e1;margin:12px 20px}
+.quick-add{margin:0 16px 20px}
+.quick-add-btn{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.main{flex:1;overflow-y:auto;padding:28px 32px}
+
+/* TOP BAR */
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.page-title{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.tabs{display:flex;border-bottom:1px solid #e8e6e1;margin-bottom:24px}
+.tab{padding:10px 20px;font-size:14px;color:#6b6b6b;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#2563eb;font-weight:500;border-bottom-color:#2563eb}
+
+/* ── HERO SUMMARY ── */
+.hero{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:22px}
+.hcard{background:#fafaf8;border-radius:10px;padding:14px 16px}
+.hcard.accent{background:#eff4ff}
+.hcard.warn{background:#fef9ed;border:1px solid #f0d882}
+.hcard-label{font-size:11px;color:#888;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.hcard-val{font-size:22px;font-weight:600;letter-spacing:-.04em;line-height:1.1}
+.hcard-val.g{color:#16864e}
+.hcard-val.b{color:#2563eb}
+.hcard-val.r{color:#c0392b}
+.hcard-sub{font-size:11px;color:#a0a0a0;margin-top:4px}
+.hcard-cta{display:inline-block;margin-top:6px;font-size:11px;color:#2563eb;cursor:pointer}
+
+/* ── CHART BLOCK ── */
+.chart-block{border:1px solid #e8e6e1;border-radius:14px;padding:22px 24px;margin-bottom:20px}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.chart-title{font-size:16px;font-weight:500}
+.chart-sub{font-size:12px;color:#888;margin-top:3px}
+.scenario-tabs{display:flex;border:1px solid #e0ddd7;border-radius:9px;overflow:hidden;font-size:12px}
+.stab{padding:6px 14px;color:#6b6b6b;cursor:pointer;background:#fff;transition:all .15s;border:none;font-family:inherit}
+.stab.active{background:#1a2035;color:#fff}
+.period-btns{display:flex;gap:6px;margin-bottom:14px}
+.pbtn{padding:5px 13px;border-radius:7px;font-size:12px;border:1px solid #e0ddd7;color:#6b6b6b;background:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.pbtn.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.chart-legend{display:flex;gap:16px;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#888}
+.leg-dot{width:10px;height:3px;border-radius:2px}
+
+/* SVG CHART WRAPPER */
+.chart-wrap{width:100%;position:relative}
+canvas#projChart{width:100%;height:260px}
+
+/* goal markers legend */
+.goal-markers{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.gm-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#6b6b6b;padding:4px 10px;border:1px solid #e8e6e1;border-radius:20px;cursor:pointer}
+.gm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── GOALS TIMELINE ── */
+.goals-block{border:1px solid #e8e6e1;border-radius:14px;padding:20px 24px;margin-bottom:20px}
+.goals-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.goals-title{font-size:16px;font-weight:500}
+.goal-item{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #f0ede8}
+.goal-item:last-child{border-bottom:none;padding-bottom:0}
+.goal-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.goal-info{flex:1;min-width:0}
+.goal-name{font-size:14px;font-weight:500;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.goal-date{font-size:12px;color:#888}
+.goal-track-wrap{display:flex;flex-direction:column;width:220px;flex-shrink:0}
+.goal-bar-bg{height:6px;background:#e8e6e1;border-radius:3px;overflow:hidden;margin-bottom:4px}
+.goal-bar-fill{height:100%;border-radius:3px}
+.goal-nums{display:flex;justify-content:space-between;font-size:11px;color:#a0a0a0}
+.goal-monthly{text-align:right;flex-shrink:0;width:110px}
+.gm-label{font-size:11px;color:#888}
+.gm-val{font-size:14px;font-weight:500;color:#2563eb;margin-top:2px}
+.goal-status{font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.gs-ok{background:#e8f5e9;color:#2e7d32}
+.gs-behind{background:#fde8e8;color:#c0392b}
+.gs-done{background:#e8f5e9;color:#2e7d32}
+
+/* ── WHAT IF ── */
+.whatif-block{border:1px solid #e8e6e1;border-radius:14px;padding:20px 24px;margin-bottom:20px}
+.whatif-title{font-size:16px;font-weight:500;margin-bottom:4px}
+.whatif-sub{font-size:13px;color:#888;margin-bottom:16px}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sc-card{padding:12px;border:1.5px solid #e8e6e1;border-radius:10px;cursor:pointer;transition:all .15s;background:#fff}
+.sc-card:hover{border-color:#c5d8f5;background:#f8faff}
+.sc-card.active{border-color:#2563eb;background:#eff4ff}
+.sc-icon{font-size:20px;margin-bottom:6px}
+.sc-name{font-size:13px;font-weight:500}
+.sc-desc{font-size:11px;color:#a0a0a0;margin-top:2px}
+.sc-result{border-radius:10px;padding:14px 18px;margin-bottom:12px}
+.sc-result.warn{background:#fef5f5;border:1px solid #f5c4c4}
+.sc-result.ok{background:#f0faf2;border:1px solid #c8e6c9}
+.sc-result-title{font-size:14px;font-weight:500;margin-bottom:10px}
+.sc-rows{display:flex;flex-direction:column;gap:5px}
+.sc-row{display:flex;justify-content:space-between;font-size:13px}
+.sc-row-label{color:#6b6b6b}
+.sc-row-val{font-weight:500}
+.sc-advice{border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.5;border-left:3px solid;border-radius:0}
+.sc-advice.warn{background:#fef9ed;color:#78350f;border-color:#f59e0b}
+.sc-advice.ok{background:#f0faf2;color:#166534;border-color:#66bb6a}
+
+/* ── DATA ACCORDION ── */
+.data-block{border:1px solid #e8e6e1;border-radius:14px;margin-bottom:20px;overflow:hidden}
+.data-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;cursor:pointer;background:#fafaf8}
+.data-header:hover{background:#f5f5f3}
+.data-toggle-icon{color:#6b6b6b;font-size:16px;transition:transform .2s}
+.data-toggle-icon.open{transform:rotate(180deg)}
+.data-body{padding:16px 20px;border-top:1px solid #e8e6e1;display:none}
+.data-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ede8}
+.data-row:last-child{border-bottom:none;padding-bottom:0}
+.dr-name{flex:1;font-size:13px;color:#6b6b6b}
+.dr-val{font-size:13px;font-weight:500;min-width:130px;text-align:right}
+.dr-link{font-size:11px;color:#2563eb;cursor:pointer;min-width:100px;text-align:right;white-space:nowrap}
+.dr-indent{padding-left:16px}
+.params-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #e8e6e1}
+.param-item{background:#f5f5f3;border-radius:10px;padding:10px 12px}
+.param-label{font-size:12px;color:#6b6b6b;margin-bottom:6px}
+.param-input{display:flex;align-items:center;gap:6px}
+.param-input input{width:52px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-weight:500;text-align:center;font-family:inherit}
+.param-hint{font-size:10px;color:#aaa;margin-top:3px}
+
+/* ROBO LINK */
+.robo-link{background:#eff4ff;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.rl-title{font-size:14px;font-weight:500;color:#1e3a6e}
+.rl-sub{font-size:12.5px;color:#5a7fb8;margin-top:3px}
+.abtn{padding:5px 12px;border-radius:7px;border:1px solid #c5d8f5;background:#fff;font-size:12px;font-weight:500;color:#2563eb;cursor:pointer;font-family:inherit;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon"></div><span class="logo-text">WhiteSwan</span></div>
+  <div class="quick-add"><button class="quick-add-btn">+ Добавить</button></div>
+  <nav>
+    <div class="nav-item">Главная</div>
+    <div class="nav-item">Все деньги</div>
+    <div class="nav-item">Активы и долги</div>
+    <div class="nav-item active">Планы и цели</div>
+    <div class="nav-item">Инвестиции</div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" style="font-size:13px;color:#a0a0a0">Настройки</div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="top-bar">
+    <h1 class="page-title">Планы и цели</h1>
+    <button style="padding:8px 16px;border:1px solid #e0ddd7;border-radius:8px;font-size:13px;color:#6b6b6b;background:#fff;cursor:pointer;font-family:inherit">+ Новая цель</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active">Финплан</div>
+    <div class="tab">Цели</div>
+  </div>
+
+  <!-- ── 1. HERO: ИТОГ ОДНОЙ СТРОКОЙ ── -->
+  <div class="hero">
+    <div class="hcard">
+      <div class="hcard-label">Капитал сейчас</div>
+      <div class="hcard-val">6.8 млн</div>
+      <div class="hcard-sub">Net Worth</div>
+      <span class="hcard-cta">Активы и долги →</span>
+    </div>
+    <div class="hcard accent">
+      <div class="hcard-label">Через 5 лет</div>
+      <div class="hcard-val b">15.1 млн</div>
+      <div class="hcard-sub">+8.3 млн · базовый сценарий</div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-label">Свободно в месяц</div>
+      <div class="hcard-val g">+25 740 ₽</div>
+      <div class="hcard-sub">после доходов, расходов и целей</div>
+    </div>
+    <div class="hcard warn">
+      <div class="hcard-label">Подушка безопасности</div>
+      <div class="hcard-val" style="font-size:18px;color:#d97706">1.9 мес</div>
+      <div class="hcard-sub" style="color:#d97706">нужно 3+ · пополните</div>
+      <span class="hcard-cta" style="color:#d97706">Исправить →</span>
+    </div>
+  </div>
+
+  <!-- ── 2. ПРОЕКЦИЯ + ЦЕЛИ НА ГРАФИКЕ ── -->
+  <div class="chart-block">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Проекция капитала</div>
+        <div class="chart-sub" id="chartSubtext">При доходности 12%, инфляции 8%, росте дохода 5%</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+        <div class="scenario-tabs">
+          <button class="stab active" onclick="setScenario('base',this)">Базовый</button>
+          <button class="stab" onclick="setScenario('opt',this)">Оптимист</button>
+          <button class="stab" onclick="setScenario('cons',this)">Осторожный</button>
+        </div>
+      </div>
+    </div>
+    <div class="period-btns">
+      <button class="pbtn" onclick="setPeriod(1,this)">1 год</button>
+      <button class="pbtn active" onclick="setPeriod(5,this)">5 лет</button>
+      <button class="pbtn" onclick="setPeriod(10,this)">10 лет</button>
+      <button class="pbtn" onclick="setPeriod(20,this)">20 лет</button>
+    </div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#2563eb;height:3px"></div>Базовый сценарий</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(37,99,235,.15);height:8px;width:14px;border-radius:2px"></div>Коридор</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#e0ddd7;height:2px;border-top:2px dashed #ccc;background:none;width:14px"></div>Без инвестиций</div>
+      <div class="leg-item"><div class="leg-dot" style="background:transparent;border:2px solid #16864e;width:10px;height:10px;border-radius:50%"></div>Цель достигнута</div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="projChart"></canvas>
+    </div>
+    <div class="goal-markers" id="goalMarkers">
+      <div class="gm-item"><div class="gm-dot" style="background:#f59e0b"></div>Отпуск · авг 2026</div>
+      <div class="gm-item"><div class="gm-dot" style="background:#7c3aed"></div>Автомобиль · янв 2028</div>
+      <div class="gm-item"><div class="gm-dot" style="background:#e06060"></div>Подушка · июн 2027 <span style="color:#c0392b;font-size:10px;margin-left:2px">отстаёт</span></div>
+    </div>
+  </div>
+
+  <!-- ── 3. ЦЕЛИ: ПРОГРЕСС + НУЖНЫЕ ВЗНОСЫ ── -->
+  <div class="goals-block">
+    <div class="goals-header">
+      <div class="goals-title">Цели и взносы</div>
+      <span style="font-size:12px;color:#2563eb;cursor:pointer">Управлять →</span>
+    </div>
+
+    <div class="goal-item">
+      <div class="goal-icon" style="background:#fff8e1">✈️</div>
+      <div class="goal-info">
+        <div class="goal-name">Отпуск в Турции <span class="goal-status gs-ok">по плану</span></div>
+        <div class="goal-date">Август 2026 · осталось 5 месяцев</div>
+      </div>
+      <div class="goal-track-wrap">
+        <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:68%;background:#f59e0b"></div></div>
+        <div class="goal-nums"><span>102 000 ₽</span><span>150 000 ₽</span></div>
+      </div>
+      <div class="goal-monthly">
+        <div class="gm-label">взнос/мес</div>
+        <div class="gm-val">9 600 ₽</div>
+      </div>
+    </div>
+
+    <div class="goal-item">
+      <div class="goal-icon" style="background:#f3e8ff">🛡️</div>
+      <div class="goal-info">
+        <div class="goal-name">Подушка безопасности <span class="goal-status gs-behind">отстаёт</span></div>
+        <div class="goal-date">Июнь 2027 · нужно ускориться</div>
+      </div>
+      <div class="goal-track-wrap">
+        <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:34%;background:#e06060"></div></div>
+        <div class="goal-nums"><span>170 000 ₽</span><span>500 000 ₽</span></div>
+      </div>
+      <div class="goal-monthly">
+        <div class="gm-label">взнос/мес</div>
+        <div class="gm-val" style="color:#c0392b">27 800 ₽</div>
+      </div>
+    </div>
+
+    <div class="goal-item">
+      <div class="goal-icon" style="background:#e8f5e9">🚗</div>
+      <div class="goal-info">
+        <div class="goal-name">Автомобиль <span class="goal-status gs-ok">по плану</span></div>
+        <div class="goal-date">Январь 2028 · осталось 22 месяца</div>
+      </div>
+      <div class="goal-track-wrap">
+        <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:72%;background:#66bb6a"></div></div>
+        <div class="goal-nums"><span>2 160 000 ₽</span><span>3 000 000 ₽</span></div>
+      </div>
+      <div class="goal-monthly">
+        <div class="gm-label">взнос/мес</div>
+        <div class="gm-val">38 200 ₽</div>
+      </div>
+    </div>
+
+    <!-- ИТОГ ВЗНОСОВ -->
+    <div style="margin-top:14px;padding-top:14px;border-top:1.5px solid #e8e6e1;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:24px">
+        <div>
+          <div style="font-size:11px;color:#888;margin-bottom:3px">Всего взносов на цели</div>
+          <div style="font-size:18px;font-weight:600;color:#c0392b">−75 600 ₽/мес</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#888;margin-bottom:3px">Свободно после целей</div>
+          <div style="font-size:18px;font-weight:600;color:#16864e">+25 740 ₽/мес</div>
+        </div>
+      </div>
+      <div style="background:#fef9ed;border:1px solid #f0d882;border-radius:10px;padding:10px 14px;font-size:12px;color:#78350f;max-width:300px;line-height:1.5">
+        <b style="font-weight:500">Подушка отстаёт:</b> увеличьте взнос на 12 000 ₽/мес — достигнете цели к июлю 2027
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. ЧТО ЕСЛИ ── -->
+  <div class="whatif-block">
+    <div class="whatif-title">Что если</div>
+    <div class="whatif-sub">Смоделируйте жизненную ситуацию — финплан пересчитается</div>
+    <div class="scenario-grid">
+      <div class="sc-card active" onclick="setWhatIf('job',this)">
+        <div class="sc-icon">💼</div>
+        <div class="sc-name">Потеря дохода</div>
+        <div class="sc-desc">На N месяцев</div>
+      </div>
+      <div class="sc-card" onclick="setWhatIf('buy',this)">
+        <div class="sc-icon">🏠</div>
+        <div class="sc-name">Крупная покупка</div>
+        <div class="sc-desc">Квартира, авто</div>
+      </div>
+      <div class="sc-card" onclick="setWhatIf('rate',this)">
+        <div class="sc-icon">📈</div>
+        <div class="sc-name">Рост ставки</div>
+        <div class="sc-desc">Ипотека дорожает</div>
+      </div>
+      <div class="sc-card" onclick="setWhatIf('baby',this)">
+        <div class="sc-icon">👶</div>
+        <div class="sc-name">Ребёнок</div>
+        <div class="sc-desc">+расходы, декрет</div>
+      </div>
+      <div class="sc-card" onclick="setWhatIf('retire',this)">
+        <div class="sc-icon">🏖</div>
+        <div class="sc-name">Ранняя пенсия</div>
+        <div class="sc-desc">В N лет</div>
+      </div>
+      <div class="sc-card" onclick="setWhatIf('custom',this)">
+        <div class="sc-icon">⚙</div>
+        <div class="sc-name">Свой сценарий</div>
+        <div class="sc-desc">Вручную</div>
+      </div>
+    </div>
+
+    <!-- Параметры сценария -->
+    <div style="background:#fafaf8;border-radius:10px;padding:14px 16px;margin-bottom:12px" id="whatifParams">
+      <div style="font-size:13px;font-weight:500;margin-bottom:10px">Потеря дохода</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Период без дохода</span>
+          <input id="wiMonths" style="width:52px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="3" oninput="recalcWhatIf()">
+          <span style="font-size:12px;color:#888">мес.</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Начиная с</span>
+          <input style="width:100px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit" value="Янв 2027">
+        </div>
+      </div>
+    </div>
+
+    <!-- Результат -->
+    <div class="sc-result warn" id="whatifResult">
+      <div class="sc-result-title" style="color:#c0392b">Потеря дохода 3 мес с января 2027</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Потери за период</span><span class="sc-row-val" style="color:#c0392b">−405 000 ₽</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val">11 680 000 ₽ <span style="font-size:11px;color:#c0392b">−1 420к к базовому</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Подушки хватит на</span><span class="sc-row-val" style="color:#d97706">1.9 мес <span style="font-size:11px;color:#c0392b">нужно 3</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Отпуск (авг 2026)</span><span class="sc-row-val" style="color:#16864e">✓ не пострадает</span></div>
+        <div class="sc-row"><span class="sc-row-label">Автомобиль (янв 2028)</span><span class="sc-row-val" style="color:#d97706">сдвигается на 4 мес</span></div>
+      </div>
+    </div>
+    <div class="sc-advice warn" id="whatifAdvice"><b>Рекомендация:</b> пополните подушку до 500 000 ₽ (5.7 мес расходов). Это защитит все цели при потере дохода до 6 месяцев</div>
+  </div>
+
+  <!-- ── 5. ДАННЫЕ (СВЁРНУТО) ── -->
+  <div class="data-block">
+    <div class="data-header" onclick="toggleData(this)">
+      <div>
+        <div style="font-size:15px;font-weight:500">Данные для расчёта</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">Финплан строится автоматически из ваших данных</div>
+      </div>
+      <div class="data-toggle-icon" id="dataIcon">▾</div>
+    </div>
+    <div class="data-body" id="dataBody">
+      <div class="data-row">
+        <div class="dr-name">Капитал (Net Worth)</div>
+        <div class="dr-val">6 815 144 ₽</div>
+        <div class="dr-link">Активы и долги →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name dr-indent" style="color:#a0a0a0">из них инвестиции</div>
+        <div class="dr-val" style="color:#888">10 072 000 ₽</div>
+        <div class="dr-link">Инвестиции →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name dr-indent" style="color:#a0a0a0">из них обязательства</div>
+        <div class="dr-val" style="color:#c0392b">−8 200 000 ₽</div>
+        <div class="dr-link">Обязательства →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name">Доходы</div>
+        <div class="dr-val" style="color:#16864e">+135 000 ₽/мес</div>
+        <div class="dr-link">Все деньги →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name">Расходы (переменные)</div>
+        <div class="dr-val" style="color:#c0392b">−87 460 ₽/мес</div>
+        <div class="dr-link">Все деньги →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name">Регулярные платежи</div>
+        <div class="dr-val" style="color:#c0392b">−21 800 ₽/мес</div>
+        <div class="dr-link">Все деньги →</div>
+      </div>
+      <div class="data-row">
+        <div class="dr-name">Взносы на цели</div>
+        <div class="dr-val" style="color:#c0392b">−75 600 ₽/мес</div>
+        <div class="dr-link">Цели →</div>
+      </div>
+      <div class="data-row" style="padding-top:12px;border-top:2px solid #e8e6e1;border-bottom:none">
+        <div class="dr-name" style="font-weight:600">Свободный излишек</div>
+        <div class="dr-val" style="color:#16864e;font-weight:600">+25 740 ₽/мес</div>
+        <div class="dr-link"></div>
+      </div>
+      <div class="params-row">
+        <div class="param-item">
+          <div class="param-label">Доходность инвестиций</div>
+          <div class="param-input"><input value="12"><span style="font-size:12px;color:#888">% год.</span></div>
+          <div class="param-hint">Факт за год: 16.2%</div>
+        </div>
+        <div class="param-item">
+          <div class="param-label">Инфляция</div>
+          <div class="param-input"><input value="8"><span style="font-size:12px;color:#888">% год.</span></div>
+          <div class="param-hint">ЦБ РФ: 6–8%</div>
+        </div>
+        <div class="param-item">
+          <div class="param-label">Рост дохода</div>
+          <div class="param-input"><input value="5"><span style="font-size:12px;color:#888">% год</span></div>
+          <div class="param-hint">Средний по РФ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RoboAdvisor ── -->
+  <div class="robo-link">
+    <div>
+      <div class="rl-title">Излишек 25 740 ₽/мес можно инвестировать через RoboAdvisor</div>
+      <div class="rl-sub">Бесплатная оценка риск-профиля · RoboAdvisor учтёт ваш финплан при составлении стратегии</div>
+    </div>
+    <button class="abtn">Оценить бесплатно →</button>
+  </div>
+
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+let currentScenario = 'base';
+let currentPeriod = 5;
+let chart = null;
+
+const scenarioMeta = {
+  base: { label:'Базовый', sub:'При доходности 12%, инфляции 8%, росте дохода 5%' },
+  opt:  { label:'Оптимистичный', sub:'При доходности 16%, инфляции 6%, росте дохода 8%' },
+  cons: { label:'Осторожный', sub:'При доходности 8%, инфляции 10%, росте дохода 3%' }
+};
+
+function genProjection(scenario, years) {
+  const start = 6.815;
+  const rates = { base:1.12, opt:1.16, cons:1.08 };
+  const noInv  = { base:1.04, opt:1.04, cons:1.02 };
+  const r = rates[scenario];
+  const n = noInv[scenario];
+  const pts = years + 1;
+  const labels = [];
+  const main = [], lo = [], hi = [], noI = [];
+  for (let i = 0; i < pts; i++) {
+    labels.push(2026 + i);
+    const v = +(start * Math.pow(r, i)).toFixed(2);
+    main.push(v);
+    lo.push(+(v * 0.88).toFixed(2));
+    hi.push(+(v * 1.12).toFixed(2));
+    noI.push(+(start * Math.pow(n, i)).toFixed(2));
+  }
+  return { labels, main, lo, hi, noI };
+}
+
+function buildChart() {
+  const d = genProjection(currentScenario, currentPeriod);
+  const ctx = document.getElementById('projChart').getContext('2d');
+
+  const bandData = d.hi.map((v,i) => v - d.lo[i]);
+
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    data: {
+      labels: d.labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Коридор (верх)',
+          data: d.hi,
+          borderColor: 'transparent',
+          backgroundColor: 'rgba(37,99,235,0.07)',
+          fill: '+1',
+          pointRadius: 0,
+          tension: 0.4,
+          order: 3
+        },
+        {
+          type: 'line',
+          label: 'Коридор (низ)',
+          data: d.lo,
+          borderColor: 'transparent',
+          backgroundColor: 'rgba(37,99,235,0.07)',
+          fill: false,
+          pointRadius: 0,
+          tension: 0.4,
+          order: 4
+        },
+        {
+          type: 'line',
+          label: 'Без инвестиций',
+          data: d.noI,
+          borderColor: '#d0cdc6',
+          borderDash: [5, 4],
+          borderWidth: 1.5,
+          backgroundColor: 'transparent',
+          pointRadius: 0,
+          tension: 0.4,
+          order: 2
+        },
+        {
+          type: 'line',
+          label: scenarioMeta[currentScenario].label,
+          data: d.main,
+          borderColor: '#2563eb',
+          borderWidth: 2.5,
+          backgroundColor: 'transparent',
+          pointRadius: d.main.map((_,i) => {
+            if (currentPeriod <= 5) return 0;
+            return 0;
+          }),
+          tension: 0.4,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff',
+          borderColor: '#e8e6e1',
+          borderWidth: 1,
+          titleColor: '#1a1a1a',
+          bodyColor: '#6b6b6b',
+          padding: 10,
+          callbacks: {
+            title: ctx => ctx[0].label + ' г.',
+            label: ctx => {
+              if (ctx.dataset.label.startsWith('Коридор')) return null;
+              return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + ' млн ₽';
+            },
+            filter: item => !item.dataset.label.startsWith('Коридор')
+          }
+        },
+        annotation: { annotations: {} }
+      },
+      scales: {
+        x: {
+          grid: { color: '#f0ede8' },
+          ticks: { font:{ size:12, family:"'IBM Plex Sans', sans-serif" }, color:'#a0a0a0' }
+        },
+        y: {
+          grid: { color: '#f0ede8' },
+          ticks: {
+            font: { size:12, family:"'IBM Plex Sans', sans-serif" },
+            color: '#a0a0a0',
+            callback: v => v + ' млн'
+          }
+        }
+      }
+    }
+  });
+}
+
+function setScenario(s, btn) {
+  currentScenario = s;
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('chartSubtext').textContent = scenarioMeta[s].sub;
+  buildChart();
+}
+
+function setPeriod(p, btn) {
+  currentPeriod = p;
+  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildChart();
+}
+
+function toggleData(hdr) {
+  const body = document.getElementById('dataBody');
+  const icon = document.getElementById('dataIcon');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  icon.textContent = open ? '▾' : '▴';
+  icon.classList.toggle('open', !open);
+}
+
+const whatIfContent = {
+  job: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Потеря дохода</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Период без дохода</span>
+          <input id="wiMonths" style="width:52px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="3" oninput="recalcWhatIf()">
+          <span style="font-size:12px;color:#888">мес.</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Начиная с</span>
+          <input style="width:100px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit" value="Янв 2027">
+        </div>
+      </div>`,
+    result: `<div style="color:#c0392b" class="sc-result-title">Потеря дохода 3 мес с января 2027</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Потери за период</span><span class="sc-row-val" style="color:#c0392b">−405 000 ₽</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val">11 680 000 ₽ <span style="font-size:11px;color:#c0392b">−1 420к к базовому</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Подушки хватит на</span><span class="sc-row-val" style="color:#d97706">1.9 мес <span style="font-size:11px;color:#c0392b">нужно 3</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Отпуск (авг 2026)</span><span class="sc-row-val" style="color:#16864e">✓ не пострадает</span></div>
+        <div class="sc-row"><span class="sc-row-label">Автомобиль (янв 2028)</span><span class="sc-row-val" style="color:#d97706">сдвигается на 4 мес</span></div>
+      </div>`,
+    rClass:'warn', advice:'warn',
+    adviceText:'<b>Рекомендация:</b> пополните подушку до 500 000 ₽ (5.7 мес расходов). Это защитит все цели при потере дохода до 6 месяцев'
+  },
+  buy: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Крупная покупка</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Сумма покупки</span>
+          <input style="width:90px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="2 000 000">
+          <span style="font-size:12px;color:#888">₽</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Когда</span>
+          <input style="width:100px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit" value="Июн 2027">
+        </div>
+      </div>`,
+    result: `<div style="color:#c0392b" class="sc-result-title">Крупная покупка 2 000 000 ₽ в июне 2027</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Единовременный расход</span><span class="sc-row-val" style="color:#c0392b">−2 000 000 ₽</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val">12 840 000 ₽ <span style="font-size:11px;color:#c0392b">−2 260к к базовому</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Автомобиль (янв 2028)</span><span class="sc-row-val" style="color:#d97706">сдвигается на 8 мес</span></div>
+        <div class="sc-row"><span class="sc-row-label">Подушка</span><span class="sc-row-val" style="color:#16864e">✓ не пострадает</span></div>
+      </div>`,
+    rClass:'warn', advice:'warn',
+    adviceText:'<b>Рекомендация:</b> при покупке на 2 млн лучше взять ипотеку на часть суммы — это сохранит инвестиционный портфель и снизит потери капитала'
+  },
+  baby: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Рождение ребёнка</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Доп. расходы/мес</span>
+          <input style="width:80px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="35 000">
+          <span style="font-size:12px;color:#888">₽</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Декрет</span>
+          <input style="width:52px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="12">
+          <span style="font-size:12px;color:#888">мес.</span>
+        </div>
+      </div>`,
+    result: `<div style="color:#d97706" class="sc-result-title">Ребёнок: +35 000 ₽/мес, декрет 12 мес</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Потери за декрет</span><span class="sc-row-val" style="color:#c0392b">−1 620 000 ₽</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val">10 200 000 ₽ <span style="font-size:11px;color:#c0392b">−4 900к к базовому</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Все цели</span><span class="sc-row-val" style="color:#d97706">сдвигаются на 10–14 мес</span></div>
+      </div>`,
+    rClass:'warn', advice:'warn',
+    adviceText:'<b>Рекомендация:</b> увеличьте подушку до 800 000 ₽ и сократите взносы на менее срочные цели на период декрета'
+  },
+  retire: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Ранняя пенсия</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Хочу выйти в</span>
+          <input style="width:60px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="50">
+          <span style="font-size:12px;color:#888">лет</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Расходы на пенсии</span>
+          <input style="width:80px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="80 000">
+          <span style="font-size:12px;color:#888">₽/мес</span>
+        </div>
+      </div>`,
+    result: `<div style="color:#16864e" class="sc-result-title">Ранняя пенсия в 50 лет: реально</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Нужный капитал</span><span class="sc-row-val">28 800 000 ₽</span></div>
+        <div class="sc-row"><span class="sc-row-label">Текущий темп</span><span class="sc-row-val" style="color:#16864e">достигнете в 52 года</span></div>
+        <div class="sc-row"><span class="sc-row-label">Чтобы в 50</span><span class="sc-row-val" style="color:#2563eb">+18 000 ₽/мес в инвестиции</span></div>
+      </div>`,
+    rClass:'ok', advice:'ok',
+    adviceText:'<b>Хорошая новость:</b> ранняя пенсия в 50 достижима — нужно увеличить инвестиционные взносы на 18 000 ₽/мес. RoboAdvisor поможет оптимизировать стратегию'
+  },
+  rate: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Рост ставки по ипотеке</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b">Новая ставка</span>
+          <input style="width:60px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="18">
+          <span style="font-size:12px;color:#888">%</span>
+        </div>
+        <div style="font-size:12px;color:#888">Сейчас: 12.5%</div>
+      </div>`,
+    result: `<div style="color:#d97706" class="sc-result-title">Ставка вырастет до 18%</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Платёж вырастет до</span><span class="sc-row-val" style="color:#c0392b">34 200 ₽/мес (+12 400)</span></div>
+        <div class="sc-row"><span class="sc-row-label">Свободный остаток</span><span class="sc-row-val" style="color:#d97706">+13 340 ₽/мес (−12 400)</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val">13 480 000 ₽ <span style="font-size:11px;color:#c0392b">−1 620к</span></span></div>
+      </div>`,
+    rClass:'warn', advice:'warn',
+    adviceText:'<b>Рекомендация:</b> при росте ставки стоит рефинансировать ипотеку или погасить часть досрочно — экономия составит 740 000 ₽ за оставшийся срок'
+  },
+  custom: {
+    params: `<div style="font-size:13px;font-weight:500;margin-bottom:10px">Свой сценарий</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b;width:140px">Изменение дохода</span>
+          <input style="width:70px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="+10%">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#6b6b6b;width:140px">Изменение расходов</span>
+          <input style="width:70px;padding:5px 8px;border:1px solid #e0ddd7;border-radius:7px;font-size:13px;font-family:inherit;text-align:center" value="+5%">
+        </div>
+      </div>`,
+    result: `<div style="color:#16864e" class="sc-result-title">Доход +10%, расходы +5%</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span class="sc-row-label">Свободный остаток</span><span class="sc-row-val" style="color:#16864e">+38 240 ₽/мес (+12 500)</span></div>
+        <div class="sc-row"><span class="sc-row-label">Капитал через 5 лет</span><span class="sc-row-val" style="color:#16864e">17 200 000 ₽ <span style="font-size:11px;color:#16864e">+2 100к к базовому</span></span></div>
+        <div class="sc-row"><span class="sc-row-label">Все цели</span><span class="sc-row-val" style="color:#16864e">✓ ускоряются на 3–5 мес</span></div>
+      </div>`,
+    rClass:'ok', advice:'ok',
+    adviceText:'<b>Отлично:</b> дополнительный излишек 12 500 ₽/мес лучше направить в инвестиции — это даст +2.1 млн к капиталу через 5 лет'
+  }
+};
+
+function setWhatIf(type, btn) {
+  document.querySelectorAll('.sc-card').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const c = whatIfContent[type];
+  document.getElementById('whatifParams').innerHTML = c.params;
+  const res = document.getElementById('whatifResult');
+  res.className = 'sc-result ' + c.rClass;
+  res.innerHTML = c.result;
+  const adv = document.getElementById('whatifAdvice');
+  adv.className = 'sc-advice ' + c.advice;
+  adv.innerHTML = c.adviceText;
+}
+
+function recalcWhatIf() {}
+
+buildChart();
+</script>
+</body>
+</html>
